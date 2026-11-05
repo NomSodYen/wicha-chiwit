@@ -53,7 +53,7 @@ function visible() {
   const p = paths.find(p => p.id === pathId);
   const base = p ? p.lessons.map(id => lessons.find(l => l.id === id)).filter(Boolean) : lessons;
   return base.filter(l => (category === 'all' || l.cat === category) && (view === 'all' || state[view].includes(l.id))
-    && (!q || [l.title, l.summary, catOf(l.cat)[2], ...l.steps].join(' ').toLocaleLowerCase('th').includes(q)));
+    && (!q || lessonText(l).toLocaleLowerCase('th').includes(q)));
 }
 function render() {
   // Re-rendering swaps the buttons, so remember which one had focus and put it back.
@@ -108,14 +108,30 @@ function nextLesson() {
   const pool = lessons.filter(l => l.id !== current.id && !state.done.includes(l.id));
   return pool.find(l => l.cat === current.cat) || pool[0] || null;
 }
+/* lesson long-form content: why[] paragraphs, steps [{t, d}] (plain strings still work),
+   example {title, body[]}, mistakes [{t, d}], explain (quiz feedback), sources [{name, url}] */
+const stepT = s => typeof s === 'string' ? s : s.t + ' ' + (s.d || '');
+function lessonText(l) {
+  return [l.title, l.summary, catOf(l.cat)[2], ...(l.why || []), ...l.steps.map(stepT),
+    ...(l.example ? [l.example.title, ...l.example.body] : []), ...(l.mistakes || []).map(stepT)].join(' ');
+}
+const paras = a => a.map(p => '<p>' + esc(p) + '</p>').join('');
+function sourcesHTML(l) {
+  const list = l.sources && l.sources.length ? l.sources : l.source ? [{name: 'เว็บไซต์หน่วยงานทางการ', url: l.source}] : [];
+  if (!list.length) return '<div class="source">บทเรียนแนวทางทั่วไป ปรับใช้ตามสถานการณ์จริง' + (['credit', 'contract'].includes(l.id) ? '<br>ตรวจเงื่อนไขปัจจุบันกับผู้ให้บริการหรือหน่วยงานที่รับผิดชอบก่อนตัดสินใจ' : '') + '</div>';
+  return '<div class="source">แหล่งอ่านเพิ่มเติม:<ul class="source-list">' + list.map(x => '<li><a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">' + esc(x.name) + '</a></li>').join('') + '</ul>'
+    + 'ตัวเลขและเงื่อนไขในบทนี้ตรวจเมื่อพฤศจิกายน 2569 อาจเปลี่ยนตามกรณีและช่วงเวลา ตรวจข้อมูลล่าสุดก่อนใช้' + (l.id === 'vote' ? '<br>ตรวจวันเลือกตั้งและหน่วยของคุณจากประกาศของ กกต. สำหรับการเลือกตั้งครั้งที่จะไปเสมอ' : '') + '</div>';
+}
 function lessonHTML(l) {
   const nx = nextLesson();
   return '<h2 id="lesson-title">' + esc(l.title) + '</h2><p class="intro">' + esc(l.summary) + '</p>'
-    + '<h3>ทีละขั้น ทำตามได้</h3><ol class="steps">' + l.steps.map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>'
+    + (l.why && l.why.length ? '<h3>ทำไมต้องรู้</h3><div class="lead">' + paras(l.why) + '</div>' : '')
+    + '<h3>ทีละขั้น ทำตามได้</h3><ol class="steps">' + l.steps.map(s => typeof s === 'string' ? '<li>' + esc(s) + '</li>' : '<li><strong class="step-t">' + esc(s.t) + '</strong>' + (s.d ? '<p class="step-d">' + esc(s.d) + '</p>' : '') + '</li>').join('') + '</ol>'
+    + (l.example ? '<h3>ตัวอย่างจริง</h3><aside class="example"><p class="example-t">' + esc(l.example.title) + '</p>' + paras(l.example.body) + '</aside>' : '')
+    + (l.mistakes && l.mistakes.length ? '<h3>พลาดกันบ่อย</h3><ul class="mistakes">' + l.mistakes.map(m => typeof m === 'string' ? '<li>' + esc(m) + '</li>' : '<li><strong>' + esc(m.t) + '</strong> <span>' + esc(m.d) + '</span></li>').join('') + '</ul>' : '')
     + '<h3>เช็กลิสต์ของฉัน</h3>' + l.check.map((s, i) => '<label class="check"><input type="checkbox" data-check="' + i + '" ' + (state.checks[l.id + ':' + i] ? 'checked' : '') + '><span>' + esc(s) + '</span></label>').join('')
     + '<h3>ลองทบทวนสักข้อ</h3><p class="quiz-q">' + esc(l.question) + '</p>' + l.options.map((s, i) => '<button type="button" class="quiz-option" data-answer="' + i + '" aria-pressed="false">' + esc(s) + '</button>').join('') + '<p id="feedback" role="status"></p>'
-    + (l.source ? '<div class="source">แหล่งอ่านเพิ่มเติม: <a href="' + esc(l.source) + '" target="_blank" rel="noopener noreferrer">เว็บไซต์หน่วยงานทางการ</a><br>เงื่อนไขอาจเปลี่ยนตามกรณีและช่วงเวลา ตรวจข้อมูลล่าสุดก่อนใช้' + (l.id === 'vote' ? '<br>แหล่งอ้างอิงเป็นตัวอย่างประกาศเดิม ไม่ใช่กำหนดการเลือกตั้งครั้งถัดไป' : '') + '</div>'
-      : '<div class="source">บทเรียนแนวทางทั่วไป ปรับใช้ตามสถานการณ์จริง' + (['credit', 'contract'].includes(l.id) ? '<br>ตรวจเงื่อนไขปัจจุบันกับผู้ให้บริการหรือหน่วยงานที่รับผิดชอบก่อนตัดสินใจ' : '') + '</div>')
+    + sourcesHTML(l)
     + (l.cat === 'money' ? '<div class="source">เนื้อหาการเงินเป็นความรู้ทั่วไป ไม่ใช่คำแนะนำการลงทุนเฉพาะบุคคล การลงทุนมีความเสี่ยง</div>' : '')
     + '<div class="lesson-actions"><button type="button" id="complete" class="btn btn--solid">' + (state.done.includes(l.id) ? 'ยกเลิกสถานะเรียนจบ' : 'ฉันเรียนบทนี้จบแล้ว') + '</button><button type="button" id="save-lesson" class="btn btn--line">' + (state.saved.includes(l.id) ? 'บันทึกไว้แล้ว' : 'บันทึกไว้เรียน') + '</button></div>'
     + (nx ? '<button type="button" class="next" data-open="' + nx.id + '">' + icon(catOf(nx.cat)[1]) + '<span><small>บทถัดไป</small><b>' + esc(nx.title) + '</b></span>' + icon('arrow-right') + '</button>' : '');
@@ -180,7 +196,7 @@ document.addEventListener('click', e => {
     const right = Number(ds.answer) === current.answer, opts = $$('[data-answer]');
     opts.forEach(x => { x.setAttribute('aria-pressed', String(x === b)); x.classList.remove('right', 'wrong'); });
     b.classList.add(right ? 'right' : 'wrong'); opts[current.answer].classList.add('right');
-    $('#feedback').textContent = right ? 'ถูกต้อง เยี่ยมมาก' : 'ยังไม่ใช่ คำตอบที่ถูกคือ “' + current.options[current.answer] + '”';
+    $('#feedback').textContent = (right ? 'ถูกต้อง เยี่ยมมาก' : 'ยังไม่ใช่ คำตอบที่ถูกคือ “' + current.options[current.answer] + '”') + (current.explain ? ' ' + current.explain : '');
   }
   if (b.id === 'complete') { const was = state.done.includes(current.id); toggle('done', current.id); b.textContent = was ? 'ฉันเรียนบทนี้จบแล้ว' : 'ยกเลิกสถานะเรียนจบ'; toast(was ? 'ยกเลิกสถานะเรียนจบแล้ว' : 'เก่งขึ้นอีกหนึ่งเรื่องแล้ว'); }
   if (b.id === 'save-lesson') { toggle('saved', current.id); b.textContent = state.saved.includes(current.id) ? 'บันทึกไว้แล้ว' : 'บันทึกไว้เรียน'; }

@@ -397,3 +397,15 @@ article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: v
   dialog[open], dialog[open]::backdrop, dialog.is-closing, dialog.is-closing::backdrop, #feedback:not(:empty) { animation: none; }
   .nk path { stroke-dashoffset: 0; }
 }
+
+/* lesson long-form content (minimal; the design pass may restyle these) */
+.lead p, .step-d, .example p, .mistakes span { line-height: 1.75; }
+.lead p + p, .example p + p { margin-top: var(--sc-3); }
+.step-t { display: block; font-weight: 600; line-height: 1.5; }
+.step-d { margin-top: var(--sc-1); color: #33463d; }
+.example { padding: var(--sc-4) var(--sc-5); border-left: 3px solid #a52a17; border-radius: var(--sc-r-sm); background: #f8f1e1; }
+.example-t { font-weight: 600; }
+.mistakes { padding-left: 1.2rem; }
+.mistakes li + li { margin-top: var(--sc-3); }
+.mistakes strong { color: #a52a17; }
+.source-list { margin: var(--sc-2) 0; padding-left: 1.2rem; }
