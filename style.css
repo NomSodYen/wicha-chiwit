@@ -30,7 +30,11 @@
 }
 [data-ground="light"] { background: var(--sc-canvas); color: var(--sc-ink); }
 
-body { line-height: 1.75; }
+html { scrollbar-gutter: stable; }
+/* While a lesson is open the page underneath stays put: no scroll chaining
+   from the sheet into the pinned acts behind it. */
+html:has(dialog[open]) { overflow: hidden; }
+body { line-height: 1.75; -webkit-tap-highlight-color: transparent; }
 h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; }
 .sc-display { line-height: var(--sc-leading-tight); text-wrap: balance; }
 .ico { width: 1.15em; height: 1.15em; flex: none; display: inline-block; vertical-align: -0.18em; }
@@ -191,6 +195,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .library { padding: var(--sc-section) var(--sc-gutter); background: var(--sc-surface); }
 .library__wrap { max-width: var(--sc-maxw); margin: auto; display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
 .library__side { position: sticky; top: var(--sc-9); display: grid; gap: var(--sc-4); }
+/* On a short laptop screen the sticky filters are taller than the window, so the
+   chips at the bottom could never be reached. Let the column scroll on its own. */
+@media (min-width: 861px) { .library__side { max-height: calc(100svh - var(--sc-9) - var(--sc-4)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 2px 6px var(--sc-4) 2px; margin: -2px -6px 0 -2px; } }
 .library__h { font-size: var(--sc-t-2xl); font-weight: 800; margin-bottom: var(--sc-2); }
 .search { display: flex; align-items: center; gap: var(--sc-3); padding: 0 var(--sc-4); min-height: 48px; border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-md); background: #fff; }
 .search:focus-within { border-color: var(--sc-ink); }
@@ -252,9 +259,19 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .text-button:hover { color: var(--sc-ink); }
 
 /* ---------------------------------------------------- lesson dialog -- */
-dialog { border: 0; padding: 0; border-radius: var(--sc-r-lg); width: min(46rem, 94vw); max-height: 92dvh; background: #fbfaf6; color: #15271f; box-shadow: var(--sc-e3); }
-dialog[open] { animation: dlg 260ms var(--sc-ease-out); }
-@keyframes dlg { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+dialog {
+  border: 0; padding: 0; border-radius: var(--sc-r-lg); width: min(46rem, 94vw); max-height: 92dvh;
+  background: #fbfaf6; color: #15271f; box-shadow: var(--sc-e3);
+  overscroll-behavior: contain;
+}
+dialog[open] { animation: dlg-in 300ms var(--sc-ease-out); }
+dialog[open]::backdrop { animation: veil-in 300ms var(--sc-ease-out); }
+dialog.is-closing { animation: dlg-out 200ms cubic-bezier(.4, 0, 1, 1) forwards; pointer-events: none; }
+dialog.is-closing::backdrop { animation: veil-out 200ms cubic-bezier(.4, 0, 1, 1) forwards; }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(16px) scale(.985); } }
+@keyframes dlg-out { to { opacity: 0; transform: translateY(10px) scale(.985); } }
+@keyframes veil-in { from { opacity: 0; } }
+@keyframes veil-out { to { opacity: 0; } }
 dialog::backdrop { background: hsl(150 33% 10% / .72); }
 .dialog-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: var(--sc-3); padding: var(--sc-3) var(--sc-3) var(--sc-3) var(--sc-6); background: #eceae2; font-size: var(--sc-t-sm); color: #475a50; }
 #lesson-cat { display: flex; gap: var(--sc-2); align-items: center; }
@@ -262,13 +279,17 @@ dialog::backdrop { background: hsl(150 33% 10% / .72); }
 .dialog-top button { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: var(--sc-r-sm); background: #fbfaf6; }
 .read-bar { position: absolute; inset: auto 0 0 0; height: 2px; }
 .read-bar span { display: block; height: 100%; background: #a52a17; transform-origin: 0 50%; transform: scaleX(0); }
-article { padding: var(--sc-6) clamp(1.25rem, 5vw, 3rem) var(--sc-8); }
-article h2 { font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-2xl); line-height: 1.4; }
-article .intro { color: #475a50; font-size: var(--sc-t-lg); margin-top: var(--sc-2); }
-article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-xl); margin: var(--sc-8) 0 var(--sc-4); }
+article { padding: var(--sc-6) clamp(1.25rem, 5vw, 3.25rem) var(--sc-8); font-size: clamp(1rem, 0.97rem + 0.2vw, 1.0625rem); line-height: 1.85; }
+article p, article li { text-wrap: pretty; }
+#lesson-content:focus { outline: none; }
+article h2 { font-family: var(--sc-font-display); font-weight: 800; font-size: var(--sc-t-2xl); line-height: 1.4; text-wrap: balance; }
+article .intro { color: #475a50; font-size: var(--sc-t-lg); line-height: 1.7; margin-top: var(--sc-3); }
+article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-xl); line-height: 1.5; margin: var(--sc-7) 0 var(--sc-4); padding-top: var(--sc-5); border-top: 1px solid #e3e0d5; }
 .steps { list-style: none; padding: 0; counter-reset: s; }
-.steps li { counter-increment: s; position: relative; padding: 0 0 var(--sc-5) 3rem; }
-.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid #a52a17; color: #a52a17; font-weight: 600; display: grid; place-items: center; font-size: var(--sc-t-sm); }
+.steps li { counter-increment: s; position: relative; padding: 0 0 var(--sc-6) 3rem; }
+/* a thin thread joins the step numbers so long steps still read as one sequence */
+.steps li:not(:last-child)::after { content: ""; position: absolute; left: calc(1rem - .75px); top: 2.35rem; bottom: .35rem; width: 1.5px; background: #e6cfc8; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 2rem; height: 2rem; border-radius: 50%; border: 1.5px solid #a52a17; color: #a52a17; font-weight: 600; display: grid; place-items: center; font-size: var(--sc-t-sm); line-height: 1; background: #fbfaf6; }
 .check { display: flex; gap: var(--sc-3); align-items: flex-start; padding: var(--sc-3) var(--sc-4); margin-top: var(--sc-2); border-radius: var(--sc-r-sm); background: #eef0e9; cursor: pointer; transition: background-color 140ms var(--sc-ease-out); }
 .check:has(input:checked) { background: #e2eed7; }
 .check input { width: 20px; height: 20px; margin-top: 4px; accent-color: #2f6b52; }
@@ -277,7 +298,9 @@ article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: v
 .quiz-option:hover { border-color: #15271f; }
 .quiz-option.right { border-color: #2f6b52; background: #e2eed7; }
 .quiz-option.wrong { border-color: #a52a17; background: #f6e3dc; }
-#feedback { font-weight: 600; min-height: 1.75em; margin-top: var(--sc-3); }
+#feedback { font-weight: 600; min-height: 1.75em; margin-top: var(--sc-3); line-height: 1.75; }
+#feedback:not(:empty) { padding: var(--sc-3) var(--sc-4); border-radius: var(--sc-r-sm); background: #eef0e9; animation: rise 240ms var(--sc-ease-out); }
+@keyframes rise { from { opacity: 0; transform: translateY(4px); } }
 .source { margin-top: var(--sc-6); padding: var(--sc-4); border-radius: var(--sc-r-sm); background: #eceae2; font-size: var(--sc-t-sm); color: #3b4d44; }
 .source a { color: #a52a17; font-weight: 600; }
 .lesson-actions { display: flex; flex-wrap: wrap; gap: var(--sc-3); margin-top: var(--sc-6); }
@@ -293,6 +316,22 @@ article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: v
 .next .ico:last-child { margin-left: auto; }
 #toast { position: fixed; left: 50%; bottom: var(--sc-6); z-index: 95; translate: -50% 0; padding: var(--sc-3) var(--sc-5); border-radius: var(--sc-r-md); background: #15271f; color: #fbfaf6; box-shadow: var(--sc-e3); opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 200ms var(--sc-ease-out), transform 200ms var(--sc-ease-out); max-width: 90vw; }
 #toast.show { opacity: 1; transform: none; }
+
+/* ------------------------------------- lesson long-form content -- */
+.lead p + p { margin-top: var(--sc-4); }
+.lead p:first-child { font-size: 1.04em; }
+.step-t { display: block; font-weight: 600; line-height: 1.6; padding-top: .2rem; }
+.step-d { margin-top: var(--sc-2); color: #34463d; }
+.step-d + .step-d { margin-top: var(--sc-3); }
+.example { padding: var(--sc-5) var(--sc-5) var(--sc-5) calc(var(--sc-5) + 2px); border-radius: var(--sc-r-sm); background: #f3efe2; box-shadow: inset 3px 0 0 #c99a3b; font-variant-numeric: tabular-nums; }
+.example-t { font-family: var(--sc-font-display); font-weight: 700; margin-bottom: var(--sc-2); }
+.example p + p { margin-top: var(--sc-3); }
+.mistakes { list-style: none; padding: 0; display: grid; gap: var(--sc-3); }
+.mistakes li { padding: var(--sc-4) var(--sc-4) var(--sc-4) calc(var(--sc-4) + 2px); border-radius: var(--sc-r-sm); background: #f8ece6; box-shadow: inset 3px 0 0 #a52a17; }
+.mistakes strong { display: block; color: #8f2617; font-weight: 600; }
+.mistakes span { display: block; margin-top: var(--sc-1); color: #3b4d44; }
+.source ul, .source ol { margin: var(--sc-2) 0 0; padding-left: 1.2em; }
+.source li + li { margin-top: var(--sc-1); }
 
 /* Desktop: the folio is a true margin folio. Vertical, inside the left gutter,
    so it never sits on top of the copy it labels. */
@@ -334,11 +373,27 @@ article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: v
   .library__side { position: static; }
   .hotlines tbody { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sc-4); }
   .hotlines tr { grid-template-columns: 1fr; gap: 0; }
+  .library__main { scroll-margin-top: 72px; }
+  /* twelve chips become one swipeable row so the list is not three screens down */
+  .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--sc-gutter)); padding: 2px var(--sc-gutter) 6px; scroll-padding-inline: var(--sc-gutter); scroll-snap-type: x proximity; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: none; scroll-snap-align: start; white-space: nowrap; }
+  /* lesson becomes a bottom sheet that slides up from the thumb */
+  dialog { width: 100%; max-width: 100%; max-height: 94dvh; margin: auto 0 0; border-radius: 22px 22px 0 0; }
+  dialog[open] { animation: sheet-in 340ms var(--sc-ease-out); }
+  dialog.is-closing { animation: sheet-out 220ms cubic-bezier(.4, 0, 1, 1) forwards; }
+  @keyframes sheet-in { from { transform: translateY(100%); } }
+  @keyframes sheet-out { to { transform: translateY(100%); } }
+  .dialog-top { padding-top: var(--sc-4); }
+  .dialog-top::before { content: ""; position: absolute; left: 50%; top: 7px; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: #c8c4b8; }
+  article { padding-bottom: calc(var(--sc-8) + env(safe-area-inset-bottom)); }
+  .steps li { padding-left: 2.6rem; }
+  #toast { bottom: calc(var(--sc-5) + env(safe-area-inset-bottom)); }
 }
 @media (min-width: 861px) and (max-width: 1180px) {
   .hotlines tbody { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  dialog[open] { animation: none; }
+  dialog[open], dialog[open]::backdrop, dialog.is-closing, dialog.is-closing::backdrop, #feedback:not(:empty) { animation: none; }
   .nk path { stroke-dashoffset: 0; }
 }
