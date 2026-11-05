@@ -2,150 +2,144 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1f4d3c">
-<meta name="description" content="วิชาชีวิต บทเรียนสั้นสำหรับเรื่องจริงในชีวิต ตั้งแต่ขึ้นรถเมล์ครั้งแรกถึงเริ่มลงทุน เรียนทีละนิด ใช้ได้ทุกวัน">
-<title>วิชาชีวิต — เรียนเรื่องจริง ใช้ได้ทุกวัน</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14281f">
+<title>วิชาชีวิต · เรียนเรื่องจริง ใช้ได้ทุกวัน</title>
+<meta name="description" content="บทเรียนสั้นสำหรับเรื่องที่ไม่มีใครสอน ตั้งแต่<span class="w">ทำบัตรประชาชน</span> <span class="w">ยื่นภาษี</span> <span class="w">จนถึงเริ่มลงทุน</span> <span class="w">อ่านไม่กี่นาที</span> <span class="w">ทำตามได้จริง</span>ในประเทศไทย">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2314281f'/><path d='M8 17l5 5 11-12' stroke='%23ff8a6e' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Noto+Serif+Thai:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="./scrollcraft.css">
 <link rel="stylesheet" href="./style.css">
-<script defer src="./data.js"></script>
-<script defer src="./app.js"></script>
 </head>
 <body>
-<a class="skip" href="#library">ข้ามไปบทเรียน</a>
-<div class="scroll-bar" aria-hidden="true"><span></span></div>
+<a class="skip" href="#library">ข้ามไปห้องสมุดบทเรียน</a>
+<span data-sc-progress></span>
+<div class="sc-grain" aria-hidden="true"></div>
 
-<header class="topbar">
-  <a class="brand" href="#top" aria-label="วิชาชีวิต หน้าแรก"><span class="logo">ว.</span><span class="brand-name">วิชาชีวิต</span></a>
-  <nav class="toplinks" aria-label="ไปยังส่วนต่าง ๆ">
-    <a href="#how">เรียนยังไง</a><a href="#cats">หมวด</a><a href="#paths">เส้นทาง</a><a href="#library">บทเรียน</a><a href="#hotlines">สายด่วน</a>
-  </nav>
-  <button class="progress-pill" id="progress-pill" aria-label="ดูบทเรียนที่เรียนจบแล้ว">
-    <svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15.5" class="ring-bg"/><circle cx="18" cy="18" r="15.5" class="ring" id="ring"/></svg>
-    <span id="progress-label">0/0</span>
-  </button>
+<!-- Folio: the chaptered-editorial nav. Mark, current chapter, progress. -->
+<header class="folio" id="folio">
+  <a class="folio__mark" href="#top">วิชาชีวิต</a>
+  <span class="folio__chapter" id="folio-chapter" aria-live="polite">ฉบับเริ่มต้น</span>
+  <button class="folio__progress" id="progress-pill" type="button"><span id="progress-label">เรียนแล้ว 0/0</span></button>
 </header>
 
 <main id="top">
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-copy">
-      <p class="pill load-in" style="--d:0">✦ ห้องเรียนสำหรับชีวิตจริง</p>
-      <h1 class="hero-title">
-        <span class="line"><span class="word" style="--d:1">บางเรื่อง</span><span class="word" style="--d:2">ไม่มี</span><span class="word" style="--d:3">ในข้อสอบ</span></span>
-        <span class="line accent"><span class="word" style="--d:4">แต่เจอ</span><span class="word" style="--d:5">ในชีวิต</span><span class="word" style="--d:6">ทุกวัน</span></span>
-      </h1>
-      <p class="hero-sub load-in" style="--d:7">ตั้งแต่ขึ้นรถเมล์ครั้งแรก ยื่นภาษี จนถึงเริ่มลงทุน<br><b id="hero-count">47</b> บทเรียนสั้น ทำตามได้ ใช้ได้จริงในประเทศไทย</p>
-      <div class="hero-actions load-in" style="--d:8">
-        <button id="start" class="btn primary">เริ่มบทเรียนแรก <span aria-hidden="true">→</span></button>
-        <a href="#library" class="btn ghost">ดูบทเรียนทั้งหมด</a>
-      </div>
+
+  <!-- 0 · TITLE PAGE: paper planes in parallax, type on the paper ground -->
+  <section class="title-page" data-sc-act="flow" data-chapter="ฉบับเริ่มต้น" data-ground="light">
+    <div class="plane plane--back" data-sc-parallax="-1.4" aria-hidden="true"><div class="sheet sheet--grid"></div></div>
+    <div class="plane plane--mid" data-sc-parallax="-0.6" aria-hidden="true"><div class="sheet sheet--ruled"><span class="sheet__margin"></span></div></div>
+    <div class="plane plane--front" data-sc-parallax="0.9" aria-hidden="true">
+      <svg class="pen" viewBox="0 0 420 40"><rect x="40" y="10" width="330" height="20" rx="10" fill="#b8321f"/><rect x="300" y="10" width="70" height="20" rx="4" fill="#8f2617"/><path d="M40 12 L4 20 L40 28 Z" fill="#e9d9c4"/><path d="M14 18 L4 20 L14 22 Z" fill="#14281f"/><rect x="330" y="4" width="12" height="32" rx="3" fill="#d9d4c7"/></svg>
+      <span class="tape"></span>
     </div>
-    <div class="stickers" aria-hidden="true">
-      <div class="sticker s1" style="--speed:.18;--r:-7deg"><i>🚌</i><span>ขึ้นรถเมล์ครั้งแรก</span></div>
-      <div class="sticker s2" style="--speed:.32;--r:6deg"><i>🧾</i><span>ยื่นภาษีครั้งแรก</span></div>
-      <div class="sticker s3" style="--speed:.1;--r:4deg"><i>📈</i><span>เริ่มลงทุนครั้งแรก</span></div>
-      <div class="sticker s4" style="--speed:.42;--r:-5deg"><i>🛟</i><span>เบอร์ฉุกเฉิน 1669</span></div>
-      <div class="sticker s5" style="--speed:.25;--r:-3deg"><i>🔐</i><span>กันมิจฉาชีพ</span></div>
-      <div class="tape" style="--speed:.5">ไม่รู้ ≠ ไม่เก่ง</div>
+    <div class="title-page__copy">
+      <h1 class="sc-display title-page__h1"><span class="ln"><span class="w">บางเรื่อง</span><span class="w">ไม่มี</span><span class="w">ในข้อสอบ</span></span><span class="ln ln--red"><span class="w">แต่เจอ</span><span class="w">ในชีวิต</span><span class="w">ทุกวัน</span></span></h1>
+      <p class="title-page__sub">บทเรียนสั้น <b id="lesson-total">47</b> บท ตั้งแต่<span class="w">ทำบัตรประชาชน</span> <span class="w">ยื่นภาษี</span> <span class="w">จนถึงเริ่มลงทุน</span> <span class="w">อ่านไม่กี่นาที</span> <span class="w">ทำตามได้จริง</span></p>
+      <button class="cta" type="button" data-start>เริ่มบทเรียนแรก <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
     </div>
-    <a class="scroll-cue" href="#how" aria-label="เลื่อนลง"><span></span></a>
   </section>
 
-  <div class="marquee-wrap" aria-hidden="true"><div class="marquee"><div class="marquee-track" id="marquee"></div></div></div>
+  <!-- 1 · THE PEAK: a red pen corrects the notebook -->
+  <section class="peak" id="peak" data-sc-act="pin" data-sc-span="3.2" data-chapter="บทที่ ๑ · ทุกคนเคยไม่รู้" data-ground="light">
+    <div data-sc-stage class="peak__stage" id="peak-stage" data-sc-verify-state="0">
+      <div class="peak__page">
+        <h2 class="peak__h">ทุกคนเคยไม่รู้</h2>
+        <ol class="peak__list" id="peak-list"></ol>
+        <p class="peak__coda" id="peak-coda">ไม่รู้ ไม่ได้แปลว่าไม่เก่ง แค่ยังไม่มีใครสอน</p>
+      </div>
+    </div>
+  </section>
 
-  <!-- HOW -->
-  <section class="how" id="how">
-    <div class="how-sticky">
-      <p class="eyebrow">เรียนยังไง</p>
-      <h2 class="section-h">บทละไม่กี่นาที<br>จบแล้ว<em>ทำได้จริง</em></h2>
-      <div class="mock" aria-hidden="true">
-        <div class="mock-top">🪪 เอกสารและราชการ · 4 นาที</div>
-        <div class="mock-body">
-          <b>ทำบัตรประชาชนครั้งแรก</b>
-          <div class="mock-part" data-part="0"><small>ทีละขั้น</small><ol><li>แยกกรณีครั้งแรก/บัตรหาย</li><li>ติดต่อสำนักทะเบียน</li><li>ตรวจข้อมูลบนบัตร</li></ol></div>
-          <div class="mock-part" data-part="1"><small>เช็กลิสต์</small><p><i>✓</i> ระบุกรณีแล้ว</p><p><i>✓</i> เตรียมเอกสารแล้ว</p><p><i></i> นัดคิวแล้ว</p></div>
-          <div class="mock-part" data-part="2"><small>ทบทวน</small><p class="q">บัตรหาย ไม่มีเอกสารรูปถ่าย?</p><p class="opt ok">ถามสำนักทะเบียนเรื่องยืนยันตัวตน ✓</p></div>
+  <!-- 2 · ONE LESSON: the page wipes in -->
+  <section class="anatomy" id="anatomy" data-sc-act="flow" data-chapter="บทที่ ๒ · หนึ่งบทเรียน" data-ground="dark">
+    <div class="anatomy__wrap">
+      <div class="anatomy__copy">
+        <h2 class="sc-display anatomy__h"><span class="w">หนึ่งบท </span><span class="w">ไม่กี่นาที</span><br><span class="w">จบแล้ว</span><span class="w">ทำได้เลย</span></h2>
+        <dl class="anatomy__parts">
+          <div><dt>ทีละขั้น</dt><dd>แตกเรื่องยากเป็นขั้นสั้น ๆ ที่ทำตามได้ทันที</dd></div>
+          <div><dt>เช็กลิสต์ของคุณ</dt><dd>ติ๊กแล้วจำไว้ในเครื่องนี้ กลับมาทำต่อเมื่อไรก็ได้</dd></div>
+          <div><dt>ทบทวนหนึ่งข้อ</dt><dd>คำถามเดียวพอให้แน่ใจ พร้อมลิงก์หน่วยงานทางการ</dd></div>
+        </dl>
+      </div>
+      <figure class="anatomy__page" data-sc-reveal="up" data-sc-reveal-at="0.12 0.5" aria-label="ตัวอย่างหน้าบทเรียน">
+        <div class="mini">
+          <p class="mini__meta">เอกสารและราชการ · 4 นาที</p>
+          <p class="mini__title">ทำบัตรประชาชนครั้งแรก / บัตรหาย</p>
+          <ol class="mini__steps"><li>แยกกรณีครั้งแรก บัตรหาย หรือหมดอายุ</li><li>ติดต่อสำนักทะเบียนเพื่อยืนยันเอกสาร</li><li>ตรวจข้อมูลบนบัตรใหม่ก่อนกลับ</li></ol>
+          <p class="mini__check is-on">ระบุกรณีของตัวเองแล้ว</p>
+          <p class="mini__check is-on">เตรียมเอกสารต้นฉบับแล้ว</p>
+          <p class="mini__check">ตรวจเอกสารกับสำนักทะเบียนแล้ว</p>
+          <p class="mini__answer">ถามสำนักทะเบียนเรื่องวิธียืนยันตัวตน</p>
         </div>
+        <figcaption>หน้าบทเรียนจริงจากหมวดเอกสารและราชการ</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3 · TWELVE AREAS: the index travels sideways -->
+  <section class="areas" id="areas" data-sc-act="pan" data-sc-span="2.8" data-chapter="บทที่ ๓ · สิบสองเรื่องของชีวิต" data-ground="light">
+    <div data-sc-stage class="areas__stage">
+      <div class="areas__rail" id="areas-rail" data-sc-pan="0.04">
+        <div class="areas__lead">
+          <h2 class="sc-display areas__h"><span class="w">สิบสองเรื่อง</span><br><span class="w">ที่ชีวิต</span><span class="w">จะถาม</span></h2>
+          <p>แตะหมวดไหนก็ได้ เพื่อไปที่บทเรียนในหมวดนั้น</p>
+        </div>
+        <!-- tiles rendered from data.js -->
       </div>
     </div>
-    <ol class="how-steps">
-      <li class="how-step" data-step="0"><span class="num">01</span><h3>อ่านทีละขั้น</h3><p>ทุกบทแตกเป็นขั้นตอนสั้น ๆ ที่ทำตามได้ทันที ไม่ต้องอ่านกฎหมายทั้งเล่ม</p></li>
-      <li class="how-step" data-step="1"><span class="num">02</span><h3>ติ๊กเช็กลิสต์ของคุณ</h3><p>เช็กลิสต์จำไว้ในเครื่องนี้ กลับมาทำต่อเมื่อไรก็ได้</p></li>
-      <li class="how-step" data-step="2"><span class="num">03</span><h3>ทบทวนหนึ่งข้อ แล้วไปต่อ</h3><p>คำถามเดียวพอให้แน่ใจว่าเข้าใจ พร้อมลิงก์หน่วยงานทางการให้ตรวจข้อมูลล่าสุด</p></li>
-    </ol>
   </section>
 
-  <section class="stats" aria-label="ภาพรวม">
-    <div class="stat reveal"><b data-count="lessons">0</b><span>บทเรียน</span></div>
-    <div class="stat reveal" style="--d:1"><b data-count="cats">0</b><span>หมวดชีวิต</span></div>
-    <div class="stat reveal" style="--d:2"><b data-count="paths">0</b><span>เส้นทางแนะนำ</span></div>
-    <div class="stat reveal" style="--d:3"><b data-count="hotlines">0</b><span>สายด่วนควรรู้</span></div>
-  </section>
-
-  <!-- CATEGORIES: pinned horizontal scroll -->
-  <section class="cats" id="cats">
-    <div class="cats-pin">
-      <div class="cats-head">
-        <p class="eyebrow">12 หมวดชีวิต</p>
-        <h2 class="section-h">เลือกเรื่องที่<em>เจออยู่ตอนนี้</em></h2>
-        <p class="cats-hint"><span class="hint-wide">เลื่อนลงเพื่อดูทุกหมวด</span><span class="hint-narrow" style="display:none">ปัดซ้ายขวาเพื่อดูทุกหมวด</span> แตะเพื่อดูบทเรียนในหมวดนั้น</p>
+  <!-- 4 · THE LIBRARY: the working surface -->
+  <section class="library" id="library" data-sc-act="flow" data-chapter="บทที่ ๔ · ห้องสมุดบทเรียน" data-ground="light">
+    <div class="library__wrap">
+      <aside class="library__side">
+        <h2 class="sc-display library__h" id="list-title">ห้องสมุดบทเรียน</h2>
+        <label class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="ค้นหา เช่น ภาษี ลงทุน เช่าห้อง" aria-label="ค้นหาบทเรียน"></label>
+        <div class="views" role="group" aria-label="มุมมอง">
+          <button type="button" data-view="all">ทั้งหมด</button><button type="button" data-view="saved">บันทึกไว้</button><button type="button" data-view="done">เรียนจบแล้ว</button>
+        </div>
+        <p class="side-label">เส้นทางแนะนำ</p>
+        <ul class="paths" id="paths"></ul>
+        <p class="side-label">หมวด</p>
+        <div class="chips" id="categories" role="group" aria-label="หมวดบทเรียน"></div>
+      </aside>
+      <div class="library__main">
+        <p class="library__status" id="status" role="status"></p>
+        <ol class="rows" id="rows"></ol>
       </div>
-      <div class="cats-track" id="cats-track"></div>
     </div>
   </section>
 
-  <!-- PATHS -->
-  <section class="paths" id="paths">
-    <p class="eyebrow reveal">เส้นทางแนะนำ</p>
-    <h2 class="section-h reveal">ไม่รู้จะเริ่มตรงไหน<br><em>ลองตามเส้นทางนี้</em></h2>
-    <div class="path-list" id="path-list"></div>
-  </section>
-
-  <!-- LIBRARY -->
-  <section class="library" id="library">
-    <div class="lib-head">
-      <div>
-        <p class="eyebrow">ห้องสมุดบทเรียน</p>
-        <h2 class="section-h" id="list-title">วันนี้อยากเรียนเรื่องอะไร?</h2>
+  <!-- 5 · COLOPHON: the back page closes the book -->
+  <section class="colophon" id="hotlines" data-sc-act="flow" data-chapter="ท้ายเล่ม · เบอร์ที่ควรรู้" data-ground="dark">
+    <div class="colophon__plate" data-sc-reveal="up" data-sc-reveal-at="0.05 0.42">
+      <h2 class="sc-display colophon__h"><span class="w">เก็บหน้านี้</span><span class="w">ไว้ในโทรศัพท์</span></h2>
+      <p class="colophon__line">เบอร์ด้านล่างแตะโทรได้ทันทีบนมือถือ และเมื่อพร้อมเมื่อไร <button type="button" class="inline-cta" data-start>เริ่มบทเรียนแรก</button> ได้เลย ไม่ต้องรู้ทุกอย่างในวันเดียว</p>
+      <table class="hotlines">
+        <caption class="visually-hidden">สายด่วนที่ควรรู้</caption>
+        <tbody id="hotline-rows"></tbody>
+      </table>
+      <div class="colophon__fine">
+        <p>บทเรียนเป็นแนวทางเบื้องต้นสำหรับประเทศไทย ไม่ใช่คำแนะนำทางกฎหมาย ภาษี หรือการลงทุนเฉพาะบุคคล ตรวจข้อมูลล่าสุดกับหน่วยงานที่รับผิดชอบก่อนใช้ ความคืบหน้าเก็บในเบราว์เซอร์นี้เท่านั้น</p>
+        <p>ไอคอนจาก Lucide (ISC) · กลไกการเลื่อนจาก scroll-craft (MIT)</p>
+        <button id="reset" type="button" class="text-button">ล้างความคืบหน้าในเครื่องนี้</button>
       </div>
-      <span id="count" class="count"></span>
     </div>
-    <div class="filters" id="filters">
-      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="ลองค้นหา “ภาษี” “ลงทุน” “เช่าห้อง”" aria-label="ค้นหาบทเรียน"></label>
-      <div class="views" role="group" aria-label="มุมมอง">
-        <button data-view="all" class="active">ทั้งหมด</button><button data-view="saved">♡ บันทึกไว้</button><button data-view="done">✓ จบแล้ว</button>
-      </div>
-      <div id="categories" class="chips" aria-label="หมวดบทเรียน"></div>
-      <div id="path-filter" class="path-filter" hidden></div>
-    </div>
-    <div id="cards" class="cards"></div>
-  </section>
-
-  <!-- HOTLINES -->
-  <section class="hotlines" id="hotlines">
-    <div class="hot-head">
-      <p class="eyebrow">เก็บไว้ในโทรศัพท์</p>
-      <h2 class="section-h">สายด่วน<em>ที่ควรรู้</em></h2>
-      <p>แตะเบอร์เพื่อโทรได้ทันทีบนมือถือ ตรวจข้อมูลกับหน่วยงานอีกครั้งเมื่อมีการเปลี่ยนแปลง</p>
-    </div>
-    <div class="hot-grid" id="hot-grid"></div>
   </section>
 </main>
 
-<footer class="footer">
-  <div class="foot-brand"><span class="logo">ว.</span><div><b>วิชาชีวิต</b><p>เรียนรู้เพื่อใช้ชีวิตอย่างมั่นใจ</p></div></div>
-  <p class="foot-note">บทเรียนเป็นแนวทางเบื้องต้นสำหรับประเทศไทย ไม่ใช่คำแนะนำทางกฎหมาย ภาษี หรือการลงทุนเฉพาะบุคคล ข้อมูลเฉพาะกรณีให้ตรวจสอบกับหน่วยงานที่รับผิดชอบ ความคืบหน้าเก็บในเบราว์เซอร์นี้เท่านั้น</p>
-  <button id="reset" class="text-button">ล้างความคืบหน้าในเครื่องนี้</button>
-</footer>
-
 <dialog id="lesson">
-  <div class="dialog-top"><span id="lesson-cat"></span><button id="close" aria-label="ปิดบทเรียน">✕</button><span class="read-bar" aria-hidden="true"><span id="read-bar"></span></span></div>
+  <div class="dialog-top"><span id="lesson-cat"></span><button id="close" type="button" aria-label="ปิดบทเรียน"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><span class="read-bar" aria-hidden="true"><span id="read-bar"></span></span></div>
   <article id="lesson-content"></article>
 </dialog>
 <p id="toast" role="status"></p>
+
+<script src="./data.js"></script>
+<script src="./icons.js"></script>
+<script src="./scrollcraft.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>

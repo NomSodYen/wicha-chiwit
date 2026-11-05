@@ -2,62 +2,62 @@ window.WICHA_DATA = {
   "cats": [
     [
       "social",
-      "🤝",
+      "handshake",
       "อยู่ร่วมกับคนอื่น"
     ],
     [
       "travel",
-      "🚌",
+      "bus",
       "เดินทางเองเป็น"
     ],
     [
       "docs",
-      "🪪",
+      "id-card",
       "เอกสารและราชการ"
     ],
     [
       "money",
-      "💰",
+      "wallet",
       "จัดการเงิน"
     ],
     [
       "work",
-      "🧾",
+      "briefcase",
       "ภาษีและงาน"
     ],
     [
       "rights",
-      "🗳️",
+      "scale",
       "สิทธิพลเมือง"
     ],
     [
       "home",
-      "🏠",
+      "house",
       "อยู่ด้วยตัวเอง"
     ],
     [
       "health",
-      "🏥",
+      "stethoscope",
       "ใช้บริการสุขภาพ"
     ],
     [
       "emergency",
-      "🛟",
+      "siren",
       "เหตุฉุกเฉิน"
     ],
     [
       "digital",
-      "🔐",
+      "shield-check",
       "ปลอดภัยออนไลน์"
     ],
     [
       "relations",
-      "💬",
+      "message-circle",
       "ความสัมพันธ์"
     ],
     [
       "consumer",
-      "🛒",
+      "shopping-cart",
       "รู้ทันการซื้อ"
     ]
   ],
@@ -1286,7 +1286,6 @@ window.WICHA_DATA = {
   "paths": [
     {
       "id": "new-grad",
-      "emoji": "🎓",
       "title": "จบใหม่ เริ่มงานแรก",
       "desc": "เอกสาร สิทธิ เงินเดือน และภาษีปีแรก",
       "lessons": [
@@ -1297,11 +1296,11 @@ window.WICHA_DATA = {
         "tax",
         "budget",
         "emergency-fund"
-      ]
+      ],
+      "icon": "graduation-cap"
     },
     {
       "id": "live-alone",
-      "emoji": "🔑",
       "title": "ย้ายออกมาอยู่เอง",
       "desc": "หาห้อง ตรวจห้อง จ่ายบิล และรับมือเหตุไม่คาดฝัน",
       "lessons": [
@@ -1311,11 +1310,11 @@ window.WICHA_DATA = {
         "fire",
         "flood",
         "move-out"
-      ]
+      ],
+      "icon": "key-round"
     },
     {
       "id": "money-plan",
-      "emoji": "📈",
       "title": "เริ่มวางแผนการเงิน",
       "desc": "จากงบรายเดือน สู่เงินสำรอง หนี้ และการลงทุน",
       "lessons": [
@@ -1327,11 +1326,11 @@ window.WICHA_DATA = {
         "fund",
         "ponzi",
         "retire"
-      ]
+      ],
+      "icon": "trending-up"
     },
     {
       "id": "side-biz",
-      "emoji": "🍔",
       "title": "มีงานประจำ ทำร้านเสริม",
       "desc": "ภาษีรายได้เสริม ระบบเงินสำรอง และเกษียณแบบคนค้าขาย",
       "lessons": [
@@ -1341,11 +1340,11 @@ window.WICHA_DATA = {
         "retire",
         "ponzi",
         "mobile-bank"
-      ]
+      ],
+      "icon": "store"
     },
     {
       "id": "safe",
-      "emoji": "🛡️",
       "title": "ปลอดภัยไว้ก่อน",
       "desc": "เบอร์ฉุกเฉิน ปฐมพยาบาล และกันมิจฉาชีพออนไลน์",
       "lessons": [
@@ -1356,7 +1355,8 @@ window.WICHA_DATA = {
         "password",
         "mobile-bank",
         "privacy"
-      ]
+      ],
+      "icon": "shield-alert"
     }
   ],
   "hotlines": [
