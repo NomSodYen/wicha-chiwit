@@ -56,6 +56,13 @@ function visible() {
     && (!q || [l.title, l.summary, catOf(l.cat)[2], ...l.steps].join(' ').toLocaleLowerCase('th').includes(q)));
 }
 function render() {
+  // Re-rendering swaps the buttons, so remember which one had focus and put it back.
+  const a = document.activeElement, k = a && a.dataset && ['cat', 'view', 'path', 'save'].find(x => a.dataset[x] !== undefined);
+  const again = k ? '[data-' + k + '="' + a.dataset[k] + '"]' : null;
+  paint();
+  if (again && !a.isConnected) { const n = document.querySelector(again); if (n) n.focus({preventScroll: true}); }
+}
+function paint() {
   const n = state.done.length, t = lessons.length;
   $('#progress-label').textContent = 'เรียนแล้ว ' + n + '/' + t;
   $$('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view && !pathId)));
@@ -74,7 +81,24 @@ function render() {
       + '<button type="button" class="row__save" data-save="' + l.id + '" aria-pressed="' + saved + '" aria-label="' + (saved ? 'เลิกบันทึก ' : 'บันทึก ') + esc(l.title) + '">' + icon('heart') + '</button></li>';
   }).join('') : '<li class="empty"><b>ยังไม่มีบทเรียนที่ตรงกัน</b><p>ลองเปลี่ยนคำค้นหรือเลือกหมวดอื่น</p><button type="button" class="btn btn--line" data-clear>ดูบทเรียนทั้งหมด</button></li>';
 }
-function goLibrary() { document.getElementById('library').scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); }
+const phone = matchMedia('(max-width: 860px)');
+function goLibrary() {
+  // On a phone the filters stack above the list, so land on the list itself.
+  const el = phone.matches ? $('.library__main') : $('#library');
+  const top = Math.max(0, el.getBoundingClientRect().top + scrollY - (phone.matches ? 72 : 0));
+  // A smooth glide across ten screens of pinned acts takes seconds and churns every
+  // animation on the way. Jump to one screen short, then glide the last stretch.
+  if (!reduce && Math.abs(top - scrollY) > innerHeight * 2) scrollTo({top: top - Math.sign(top - scrollY) * innerHeight, behavior: 'instant'});
+  requestAnimationFrame(() => scrollTo({top, behavior: reduce ? 'instant' : 'smooth'}));
+}
+/* After a filter changes, the list can shrink under the reader. If they were down
+   in it, bring them back to the top of the results instead of leaving them in the
+   footer, and let the new rows fade in rather than snap. */
+function settleList() {
+  const wrap = $('.library__wrap'), r = wrap.getBoundingClientRect();
+  if (r.top < -8) scrollTo({top: r.top + scrollY - (phone.matches ? 72 : 24), behavior: reduce ? 'instant' : 'smooth'});
+  if (!reduce) $('#rows').animate([{opacity: 0, transform: 'translateY(6px)'}, {opacity: 1, transform: 'none'}], {duration: 220, easing: 'cubic-bezier(.23,1,.32,1)'});
+}
 function resetFilters() { view = 'all'; category = 'all'; pathId = null; $('#search').value = ''; }
 
 /* ---------------- lesson dialog ---------------- */
@@ -96,22 +120,48 @@ function lessonHTML(l) {
     + '<div class="lesson-actions"><button type="button" id="complete" class="btn btn--solid">' + (state.done.includes(l.id) ? 'ยกเลิกสถานะเรียนจบ' : 'ฉันเรียนบทนี้จบแล้ว') + '</button><button type="button" id="save-lesson" class="btn btn--line">' + (state.saved.includes(l.id) ? 'บันทึกไว้แล้ว' : 'บันทึกไว้เรียน') + '</button></div>'
     + (nx ? '<button type="button" class="next" data-open="' + nx.id + '">' + icon(catOf(nx.cat)[1]) + '<span><small>บทถัดไป</small><b>' + esc(nx.title) + '</b></span>' + icon('arrow-right') + '</button>' : '');
 }
-function openLesson(id) {
-  const l = lessons.find(x => x.id === id); if (!l) return;
-  const d = $('#lesson');
-  if (!d.open) returnFocus = document.activeElement;
+function fillLesson(l) {
   current = l; const c = catOf(l.cat);
   $('#lesson-cat').innerHTML = icon(c[1]) + '<span>' + esc(c[2]) + ' · ' + l.minutes + ' นาที</span>';
   $('#lesson-content').innerHTML = lessonHTML(l);
+}
+function openLesson(id) {
+  const l = lessons.find(x => x.id === id); if (!l) return;
+  const d = $('#lesson'), art = $('#lesson-content');
   d.setAttribute('aria-labelledby', 'lesson-title');
-  if (!d.open) d.showModal();
+  if (d.open) {
+    // "Next lesson" inside the dialog: cross-fade the page instead of snapping.
+    if (reduce) { fillLesson(l); d.scrollTop = 0; readBar(); return; }
+    art.getAnimations().forEach(x => x.cancel());
+    const out = art.animate([{opacity: 1}, {opacity: 0}], {duration: 120, easing: 'ease-in', fill: 'forwards'});
+    out.finished.then(() => {
+      fillLesson(l); d.scrollTop = 0; readBar(); out.cancel();
+      art.animate([{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'none'}], {duration: 260, easing: 'cubic-bezier(.23,1,.32,1)'});
+    }).catch(() => {});
+    return;
+  }
+  returnFocus = document.activeElement;
+  d.classList.remove('is-closing');
+  fillLesson(l);
+  d.showModal();
   d.scrollTop = 0; readBar();
+}
+let closeTimer;
+function closeLesson() {
+  const d = $('#lesson');
+  if (!d.open || d.classList.contains('is-closing')) return;
+  if (reduce) { d.close(); return; }
+  d.classList.add('is-closing');
+  const done = () => { clearTimeout(closeTimer); if (d.classList.contains('is-closing')) { d.classList.remove('is-closing'); d.close(); } };
+  d.addEventListener('animationend', e => { if (e.target === d) done(); }, {once: true});
+  closeTimer = setTimeout(done, 400);
 }
 function readBar() { const d = $('#lesson'), m = d.scrollHeight - d.clientHeight; $('#read-bar').style.transform = 'scaleX(' + (m > 0 ? d.scrollTop / m : 1) + ')'; }
 $('#lesson').addEventListener('scroll', readBar, {passive: true});
-$('#close').addEventListener('click', () => $('#lesson').close());
+$('#close').addEventListener('click', closeLesson);
+$('#lesson').addEventListener('cancel', e => { e.preventDefault(); closeLesson(); });
 $('#lesson').addEventListener('close', () => { if (returnFocus && returnFocus.isConnected) returnFocus.focus({preventScroll: true}); });
-$('#lesson').addEventListener('click', e => { if (e.target === $('#lesson')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close(); } });
+$('#lesson').addEventListener('click', e => { if (e.target === $('#lesson')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) closeLesson(); } });
 $('#lesson-content').addEventListener('change', e => { if (e.target.dataset.check !== undefined && current) { state.checks[current.id + ':' + e.target.dataset.check] = e.target.checked; persist(); } });
 
 /* ---------------- events ---------------- */
@@ -120,11 +170,11 @@ document.addEventListener('click', e => {
   const ds = b.dataset;
   if (ds.open) { e.preventDefault(); openLesson(ds.open); return; }
   if (b.hasAttribute('data-start')) { openLesson((lessons.find(l => !state.done.includes(l.id)) || lessons[0]).id); return; }
-  if (ds.view) { resetFilters(); view = ds.view; render(); }
-  if (ds.cat) { category = ds.cat; render(); }
+  if (ds.view) { resetFilters(); view = ds.view; render(); settleList(); }
+  if (ds.cat) { category = ds.cat; render(); settleList(); }
   if (ds.catJump) { resetFilters(); category = ds.catJump; render(); goLibrary(); }
-  if (ds.path) { const same = pathId === ds.path; resetFilters(); pathId = same ? null : ds.path; render(); }
-  if (b.hasAttribute('data-clear')) { resetFilters(); render(); }
+  if (ds.path) { const same = pathId === ds.path; resetFilters(); pathId = same ? null : ds.path; render(); settleList(); }
+  if (b.hasAttribute('data-clear')) { resetFilters(); render(); settleList(); }
   if (ds.save) { toggle('saved', ds.save); toast(state.saved.includes(ds.save) ? 'บันทึกบทเรียนแล้ว' : 'นำออกจากรายการบันทึกแล้ว'); }
   if (ds.answer !== undefined && current) {
     const right = Number(ds.answer) === current.answer, opts = $$('[data-answer]');
@@ -137,7 +187,7 @@ document.addEventListener('click', e => {
   if (b.id === 'progress-pill') { resetFilters(); view = 'done'; render(); goLibrary(); }
   if (b.id === 'reset' && confirm('ล้างบทเรียนที่บันทึก เช็กลิสต์ และความคืบหน้าทั้งหมดในเบราว์เซอร์นี้?')) { state = {saved: [], done: [], checks: {}}; persist(); render(); toast('ล้างข้อมูลแล้ว'); }
 });
-$('#search').addEventListener('input', render);
+$('#search').addEventListener('input', () => { render(); const r = $('.library__wrap').getBoundingClientRect(); if (r.top < -8) scrollTo({top: r.top + scrollY - 24, behavior: 'instant'}); });
 
 /* ---------------- the red pen (signature move) ---------------- */
 const peak = $('#peak'), peakStage = $('#peak-stage');
@@ -167,7 +217,20 @@ let lastChapter = '';
 function updateFolio() {
   const y = 32; let cur = chapters[0];
   for (const s of chapters) { if (s.getBoundingClientRect().top <= y) cur = s; }
-  if (cur.dataset.chapter !== lastChapter) { lastChapter = cur.dataset.chapter; folioChapter.textContent = lastChapter; }
+  if (cur.dataset.chapter !== lastChapter) {
+    const first = !lastChapter; lastChapter = cur.dataset.chapter;
+    if (first || reduce) folioChapter.textContent = lastChapter;
+    else {
+      // Cross-fade the running head instead of swapping the words mid-glance.
+      const next = lastChapter;
+      folioChapter.getAnimations().forEach(x => x.cancel());
+      folioChapter.animate([{opacity: 1}, {opacity: 0}], {duration: 120, fill: 'forwards'}).finished.then(() => {
+        if (lastChapter !== next) return;
+        folioChapter.textContent = next;
+        folioChapter.animate([{opacity: 0}, {opacity: 1}], {duration: 200, fill: 'forwards'});
+      }).catch(() => {});
+    }
+  }
   folio.classList.toggle('on-dark', cur.dataset.ground === 'dark');
 }
 
