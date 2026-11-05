@@ -95,13 +95,33 @@ button:disabled { cursor: not-allowed; opacity: .5; }
     linear-gradient(90deg, #d8dbd3 1px, transparent 1px) 0 0 / 26px 26px,
     #f1f0ea;
 }
-.sheet--ruled {
-  position: relative; rotate: -4deg; box-shadow: var(--sc-e3), var(--sc-edge);
-  background: repeating-linear-gradient(transparent 0 33px, var(--rule) 33px 34px) 0 70px / 100% auto no-repeat, #fbfaf6;
+.sheet--ruled { position: relative; rotate: -4deg; box-shadow: var(--sc-e3), var(--sc-edge); container-type: inline-size; background: #fbfaf6; }
+/* ruling lives on a pseudo-element so its cqw resolve against the sheet */
+.sheet--ruled::before { content: ""; position: absolute; inset: 17.6cqw 0 0; background: repeating-linear-gradient(transparent 0 calc(7.4cqw - 1px), var(--rule) calc(7.4cqw - 1px) 7.4cqw); }
+.sticky {
+  position: absolute; right: 6cqw; bottom: 7cqw; width: 27cqw; aspect-ratio: 1; padding: 3cqw; rotate: 5deg;
+  display: grid; place-content: center; text-align: center;
+  background: hsl(46 78% 80%); box-shadow: 0 6px 12px -6px hsl(150 30% 12% / .35);
+  font-family: var(--sc-font-display); font-weight: 800; font-size: 4.6cqw; line-height: 1.35; color: #15271f;
 }
+/* the notebook page: content set on the ruling, sized to the sheet */
+.nb { position: absolute; inset: 0; padding: 4.6cqw 7cqw 0 21cqw; color: #15271f; font-family: var(--sc-font-display); }
+.nb__head { display: flex; justify-content: space-between; font-family: var(--sc-font-text); font-size: 3.1cqw; color: #6a7a71; height: 7.4cqw; }
+.nb__title { font-weight: 800; font-size: 6.4cqw; line-height: 7.4cqw; height: 7.4cqw; margin-top: -1.2cqw; }
+.nb__list { list-style: none; padding: 0; margin-top: 3.1cqw; }
+.nb__item { position: relative; display: flex; align-items: center; gap: 2.6cqw; height: 7.4cqw; font-weight: 700; font-size: 4.3cqw; }
+.nb__box { width: 3.6cqw; height: 3.6cqw; border: .45cqw solid #2f6b52; border-radius: .8cqw; flex: none; translate: 0 .3cqw; }
+.nb__item.is-done .nb__box { background: #2f6b52 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 75% no-repeat; }
+.nb__item.is-done .nb__txt { color: #6a7a71; text-decoration: line-through; text-decoration-color: #a52a17; text-decoration-thickness: .45cqw; }
+.nb__ring { position: absolute; left: 3.5cqw; top: -.6cqw; width: 42cqw; height: 8.6cqw; overflow: visible; }
+.nb__ring path { fill: none; stroke: #a52a17; stroke-width: 2.4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.nb__note { position: absolute; left: 48cqw; top: -2.6cqw; rotate: -8deg; color: #a52a17; font-weight: 800; font-size: 3.8cqw; white-space: nowrap; }
+.nb__sum { position: absolute; left: 21cqw; top: 93cqw; display: grid; font-family: var(--sc-font-text); font-size: 3.5cqw; line-height: 7.4cqw; color: #2f4a3d; }
+.nb__sum b { color: #a52a17; font-weight: 600; box-shadow: inset 0 -1.4cqw hsl(46 78% 80%); }
+.nb__foot { position: absolute; left: 21cqw; top: 76.2cqw; font-size: 3.6cqw; color: #a52a17; font-weight: 700; rotate: -2deg; }
 .sheet__margin { position: absolute; top: 0; bottom: 0; left: 16%; width: 1px; background: var(--margin-red); }
 .pen { width: 100%; height: auto; rotate: -14deg; filter: drop-shadow(0 10px 12px hsl(150 30% 12% / .28)); }
-.tape { position: absolute; left: 38%; top: -34vh; width: 120px; height: 34px; rotate: 9deg; background: hsl(46 70% 78% / .82); box-shadow: 0 2px 4px hsl(150 30% 12% / .12); }
+.tape { position: absolute; z-index: 1; left: 44%; top: -3cqw; width: 24cqw; height: 6.6cqw; rotate: 9deg; background: hsl(46 70% 78% / .82); box-shadow: 0 2px 4px hsl(150 30% 12% / .12); }
 .title-page__copy { position: relative; z-index: 2; max-width: 48rem; }
 .title-page__h1 { font-size: clamp(2.3rem, 0.9rem + 3.9vw, 4.6rem); font-weight: 800; letter-spacing: var(--sc-track-tight); }
 .title-page__h1 .ln { display: block; }
@@ -314,9 +334,9 @@ article h3 { font-family: var(--sc-font-display); font-weight: 700; font-size: v
   .folio__chapter { display: none; }
   .title-page { align-items: end; padding: 7rem var(--sc-gutter) var(--sc-8); }
   .plane--back  { right: -30vw; top: 9vh; width: 78vw; }
-  .plane--mid   { right: -6vw;  top: 12vh; width: 52vw; }
+  .plane--mid   { right: 3vw;  top: 12vh; width: 52vw; }
+  .sticky { bottom: 40cqw; right: 4cqw; }
   .plane--front { right: -18vw; top: 38vh; width: 84vw; }
-  .tape { width: 84px; height: 26px; top: -22vh; left: 30%; }
   .title-page__h1 { font-size: var(--sc-t-2xl); }
   .title-page__sub { font-size: var(--sc-t-base); margin: var(--sc-4) 0 var(--sc-6); }
   .peak__page { padding-left: 2.6rem; }
